@@ -1,0 +1,1 @@
+# drizzle-sample-schema
