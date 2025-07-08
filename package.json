@@ -1,0 +1,36 @@
+{
+  "name": "drizzle-sample-schema",
+  "version": "1.0.0",
+  "description": "Collection of Drizzle ORM schema examples",
+  "type": "module",
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
+    "push": "drizzle-kit push",
+    "introspect": "drizzle-kit introspect",
+    "check": "drizzle-kit check"
+  },
+  "keywords": [
+    "drizzle",
+    "orm",
+    "schema",
+    "examples",
+    "typescript",
+    "database"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "drizzle-kit": "^0.20.14",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.29.3",
+    "mysql2": "^3.9.1",
+    "pg": "^8.11.3",
+    "better-sqlite3": "^11.6.1"
+  }
+}
