@@ -3,10 +3,16 @@ import { relations } from 'drizzle-orm';
 
 // Example 1: User and role relationship table (user_id + role_id)
 export const userRoles = pgTable('user_roles', {
-  userId: integer('user_id').notNull(),
-  roleId: integer('role_id').notNull(),
+  userId: integer('user_id').notNull().references(() => users.id, {
+    onDelete: 'cascade'
+  }),
+  roleId: integer('role_id').notNull().references(() => roles.id, {
+    onDelete: 'cascade'
+  }),
   assignedAt: timestamp('assigned_at').defaultNow(),
-  assignedBy: integer('assigned_by'),
+  assignedBy: integer('assigned_by').references(() => users.id, {
+    onDelete: 'set null'
+  }),
 }, (table) => {
   return {
     pk: primaryKey({ columns: [table.userId, table.roleId] }),
@@ -15,8 +21,12 @@ export const userRoles = pgTable('user_roles', {
 
 // Example 2: Order details table (order_id + product_id)
 export const orderItems = pgTable('order_items', {
-  orderId: integer('order_id').notNull(),
-  productId: integer('product_id').notNull(),
+  orderId: integer('order_id').notNull().references(() => orders.id, {
+    onDelete: 'cascade'
+  }),
+  productId: integer('product_id').notNull().references(() => products.id, {
+    onDelete: 'cascade'
+  }),
   quantity: integer('quantity').notNull(),
   unitPrice: integer('unit_price').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
@@ -28,7 +38,9 @@ export const orderItems = pgTable('order_items', {
 
 // Example 3: Multilingual support table (entity_id + language_code)
 export const translations = pgTable('translations', {
-  entityId: integer('entity_id').notNull(),
+  entityId: integer('entity_id').notNull().references(() => entities.id, {
+    onDelete: 'cascade'
+  }),
   languageCode: text('language_code').notNull(),
   title: text('title').notNull(),
   description: text('description'),
@@ -41,7 +53,9 @@ export const translations = pgTable('translations', {
 
 // Example 4: Time series data table (device_id + timestamp)
 export const sensorData = pgTable('sensor_data', {
-  deviceId: text('device_id').notNull(),
+  deviceId: text('device_id').notNull().references(() => devices.id, {
+    onDelete: 'cascade'
+  }),
   timestamp: timestamp('timestamp').notNull(),
   temperature: integer('temperature'),
   humidity: integer('humidity'),
@@ -54,11 +68,17 @@ export const sensorData = pgTable('sensor_data', {
 
 // Example 5: Three-column composite primary key
 export const userProjectPermissions = pgTable('user_project_permissions', {
-  userId: integer('user_id').notNull(),
-  projectId: integer('project_id').notNull(),
+  userId: integer('user_id').notNull().references(() => users.id, {
+    onDelete: 'cascade'
+  }),
+  projectId: integer('project_id').notNull().references(() => projects.id, {
+    onDelete: 'cascade'
+  }),
   permission: text('permission').notNull(), // 'read', 'write', 'admin'
   grantedAt: timestamp('granted_at').defaultNow(),
-  grantedBy: integer('granted_by'),
+  grantedBy: integer('granted_by').references(() => users.id, {
+    onDelete: 'set null'
+  }),
 }, (table) => {
   return {
     pk: primaryKey({ columns: [table.userId, table.projectId, table.permission] }),
@@ -147,7 +167,9 @@ export const userProjectPermissionsRelations = relations(userProjectPermissions,
 // Additional related tables (for demonstration)
 export const orders = pgTable('orders', {
   id: integer('id').primaryKey(),
-  userId: integer('user_id').notNull(),
+  userId: integer('user_id').notNull().references(() => users.id, {
+    onDelete: 'cascade'
+  }),
   total: integer('total').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
