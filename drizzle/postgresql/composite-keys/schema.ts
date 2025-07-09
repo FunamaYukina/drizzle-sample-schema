@@ -1,4 +1,5 @@
 import { pgTable, text, integer, timestamp, primaryKey } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 
 // Example 1: User and role relationship table (user_id + role_id)
 export const userRoles = pgTable('user_roles', {
@@ -77,3 +78,102 @@ export const roles = pgTable('roles', {
   name: text('name').notNull(),
   description: text('description'),
 });
+
+// Relations definitions
+export const usersRelations = relations(users, ({ many }) => ({
+  userRoles: many(userRoles),
+  userProjectPermissions: many(userProjectPermissions),
+}));
+
+export const rolesRelations = relations(roles, ({ many }) => ({
+  userRoles: many(userRoles),
+}));
+
+export const userRolesRelations = relations(userRoles, ({ one }) => ({
+  user: one(users, {
+    fields: [userRoles.userId],
+    references: [users.id],
+  }),
+  role: one(roles, {
+    fields: [userRoles.roleId],
+    references: [roles.id],
+  }),
+  assignedByUser: one(users, {
+    fields: [userRoles.assignedBy],
+    references: [users.id],
+  }),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+  product: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
+  }),
+}));
+
+export const translationsRelations = relations(translations, ({ one }) => ({
+  entity: one(entities, {
+    fields: [translations.entityId],
+    references: [entities.id],
+  }),
+}));
+
+export const sensorDataRelations = relations(sensorData, ({ one }) => ({
+  device: one(devices, {
+    fields: [sensorData.deviceId],
+    references: [devices.id],
+  }),
+}));
+
+export const userProjectPermissionsRelations = relations(userProjectPermissions, ({ one }) => ({
+  user: one(users, {
+    fields: [userProjectPermissions.userId],
+    references: [users.id],
+  }),
+  project: one(projects, {
+    fields: [userProjectPermissions.projectId],
+    references: [projects.id],
+  }),
+  grantedByUser: one(users, {
+    fields: [userProjectPermissions.grantedBy],
+    references: [users.id],
+  }),
+}));
+
+// Additional related tables (for demonstration)
+export const orders = pgTable('orders', {
+  id: integer('id').primaryKey(),
+  userId: integer('user_id').notNull(),
+  total: integer('total').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const products = pgTable('products', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  price: integer('price').notNull(),
+});
+
+export const entities = pgTable('entities', {
+  id: integer('id').primaryKey(),
+  type: text('type').notNull(), // 'article', 'product', etc.
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const devices = pgTable('devices', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  location: text('location'),
+  installedAt: timestamp('installed_at').defaultNow(),
+});
+
+export const projects = pgTable('projects', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow(),
+});;
